@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  trafgen:
+    # from host, remember to set ZBAT_HOME first
+    env_file: $ZBAT_HOME/.bash_profile
+    build: $ZBAT_HOME/docker/trafgen
+    image: zbat_trafgen_image
+    container_name: zbat_trafgen_container
+    networks:
+      - mgmt
+      - mirror
+    ports:
+      - "20022:22/tcp"
+    volumes:
+      - $ZBAT_HOME:$ZBAT_HOME
+      # mapping our .bash_profile to /etc/profile.d is to enable all env variables
+      #   so that any ssh session into this container has access to those env
+      #   this is needed since env contain AWS access required by
+      - $ZBAT_HOME/.bash_profile:/etc/profile.d/bash_profile.sh
+    working_dir: $ZBAT_HOME
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    privileged: true
+    
+  jenkins:
+    image: jenkins/jenkins:lts
+    volumes: "/data/jenkins"
+    
+    
+networks:
+  # use default network driver for management network
+  mgmt:
+  # this is mirror network.  require usage of macvlan network
+  #   to map container to physic host interface
+  mirror:
+    driver: macvlan
+    driver_opts:
+      parent: ens192

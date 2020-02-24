@@ -1,0 +1,51 @@
+
+1)  Configure certbot-auto to generate and renew certificate.  The following is setup in root crontab
+
+'''
+**15 5 * * 5 /usr/local/sbin/certbot-auto renew >> /var/log/le-renew.log**
+'''
+
+2)  Bring up docker instance of Jenkins, using the docker-compose.yml.  Note that the mounted home directory on host is /data/jenkins and on the container it is /var/jenkins_home/
+
+'''
+cd $ZBAT_HOME/docker/jenkins
+docker-compose up -d jenkins
+'''
+
+3)  Nginx is the front end LB that proxy 443 to Jenkins 8080. 
+    - Below is the configuration of /etc/nginx/sites-available/default
+
+'''
+upstream jenkins {
+  server 127.0.0.1:8080 fail_timeout=0;
+}
+
+server {
+  listen 80;
+  server_name jenkins-master.cloud.zingbox.com;
+  return 301 https://$host$request_uri;
+}
+
+server {
+  listen 443 ssl;
+  server_name jenkins-master.cloud.zingbox.com;
+
+  ssl_certificate /etc/letsencrypt/archive/jenkins-master.cloud.zingbox.com/cert2.pem;
+  ssl_certificate_key /etc/letsencrypt/archive/jenkins-master.cloud.zingbox.com/privkey2.pem;
+
+  location / {
+    proxy_set_header        Host $host:$server_port;
+    proxy_set_header        X-Real-IP $remote_addr;
+    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header        X-Forwarded-Proto $scheme;
+    proxy_redirect http:// https://;
+    proxy_pass              http://jenkins;
+    # Required for new HTTP-based CLI
+    proxy_http_version 1.1;
+    proxy_request_buffering off;
+    proxy_buffering off; # Required for HTTP-based CLI to work over SSL
+    # workaround for https://issues.jenkins-ci.org/browse/JENKINS-45651
+    add_header 'X-SSH-Endpoint' 'jenkins-master.cloud.zingbox.com:50022' always;
+  }
+}
+'''

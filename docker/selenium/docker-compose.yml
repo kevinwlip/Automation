@@ -1,0 +1,268 @@
+version: '3'
+
+services:
+
+  selenium-hub:
+    image: selenium/hub:latest
+    container_name: zbat_selenium_hub
+    environment:
+      - GRID_NEW_SESSION_WAIT_TIMEOUT=5123
+      - GRID_TIMEOUT=9
+      - GRID_BROWSER_TIMEOUT=45
+    ports:
+      - 4444:4444
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true
+
+  selenium-node-0:
+    image: selenium/node-chrome:latest
+    container_name: node_chrome
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5551"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5551:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true
+
+
+  selenium-node-firefox:
+    image: selenium/node-firefox:latest
+    container_name: node_firefox
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5552"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5552:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true 
+  
+  selenium-node-1:
+    image: selenium/node-chrome:latest
+    container_name: zbat_selenium_node_5551
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5551"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5551:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true
+
+
+  selenium-node-2:
+    image: selenium/node-chrome:latest
+    container_name: zbat_selenium_node_5552
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5552"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5552:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true 
+
+  selenium-node-3:
+    image: selenium/node-chrome:latest
+    container_name: zbat_selenium_node_5553
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5553"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5553:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true
+
+  selenium-node-4:
+    image: selenium/node-chrome:latest
+    container_name: zbat_selenium_node_5554
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5554"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5554:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true
+
+  selenium-node-5:
+    image: selenium/node-chrome:latest
+    container_name: zbat_selenium_node_5555
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5555"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5555:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true
+
+  selenium-node-6:
+    image: selenium/node-chrome:latest
+    container_name: zbat_selenium_node_5556
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5556"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5556:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true
+  
+
+  selenium-node-7:
+    image: selenium/node-chrome:latest
+    container_name: zbat_selenium_node_5557
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5557"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5557:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true
+
+
+  selenium-node-8:
+    image: selenium/node-chrome:latest
+    container_name: zbat_selenium_node_5558
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5558"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5558:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true
+
+
+  selenium-node-9:
+    image: selenium/node-chrome:latest
+    container_name: zbat_selenium_node_5559
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5559"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5559:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true
+
+
+  selenium-node-10:
+    image: selenium/node-chrome:latest
+    container_name: zbat_selenium_node_5560
+    environment:
+      - HUB_HOST=selenium-linux001.cloud.zingbox.com
+      - HUB_PORT=4444
+      - REMOTE_HOST="http://selenium-linux002.cloud.zingbox.com:5560"
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - 5560:5555
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tty: true
+    stdin_open: true
+    privileged: true
+

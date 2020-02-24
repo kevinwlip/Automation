@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+
+  zbat:
+    build: $ZBAT_HOME/docker/zbat
+    privileged: true
+    tty: true
+    stdin_open: true
+    volumes:
+      - /dev/shm:/dev/shm
