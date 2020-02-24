@@ -1,7 +1,7 @@
 # zbat
 
 0)  Checkout source
-git checkout https://github.com/ZingBox/zbat.git
+git checkout https://github.com/kevinwlip/Automation.git
 
 
 QA Automation setup
@@ -43,7 +43,7 @@ Example:
 ```
 export ZBAT_TENANT_INTERNAL_ID=ABCDEFGHIJKLMNOPQRSTUVWXYZ012345
 export KAFKA_PRODUCER=/home/ubuntu/zbat/3p/kafka_2.11-0.8.2.1/bin/kafka-console-producer.sh
-export ZBAT_O365_EMAIL_ACCOUNT=your_email@zingbox.com
+export ZBAT_O365_EMAIL_ACCOUNT=your_email@host.com
 export ZBAT_O365_EMAIL_PWD=your_password
 export ZBAT_TEXT_NOW_UNAME=jeffreylee
 export ZBAT_TEXT_NOW_PWD=your_password
@@ -142,10 +142,10 @@ Example:
 
 
 ```
-export ZBAT_O365_EMAIL_ACCOUNT=qa@zingbox.com
-export ZBAT_USER_ONBOARD_EMAIL=zbatdist@zingbox.com
-export ZBAT_RESELLER_ONBOARD_EMAIL=zbatres@zingbox.com
-export ZBAT_CUSTOMER_ONBOARD_EMAIL=zbatcus@zingbox.com
+export ZBAT_O365_EMAIL_ACCOUNT=qa@host.com
+export ZBAT_USER_ONBOARD_EMAIL=zbatdist@host.com
+export ZBAT_RESELLER_ONBOARD_EMAIL=zbatres@host.com
+export ZBAT_CUSTOMER_ONBOARD_EMAIL=zbatcus@host.com
 
 ```
 
