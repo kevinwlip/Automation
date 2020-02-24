@@ -1,0 +1,52 @@
+#endpoints.yaml
+
+dashboard/series:
+    url: url_temp
+    header:
+        stime: stime_temp
+        etime: etime_temp
+        tenantid: tenantid_temp
+        filter_monitored: yes
+        interval: interval_temp
+        direction: all
+    body: body_temp
+    config:
+        maxlatency: 10000 # In milliseconds
+        minbodysize: 200 # In milliseconds
+    baseline:
+        tps: 1
+
+
+iotprofile/stats:
+    url: url_temp
+    header:
+        stime: stime_temp
+        etime: etime_temp
+        tenantid: tenantid_temp
+        filter_monitored: yes
+        interval: interval_temp
+        outputtype: site
+    body: body_temp
+    config:
+        maxlatency: 10000
+        minbodysize: 200
+    baseline:
+        tps: 1
+
+
+dashboard/stat:
+    url: url_temp
+    header:
+        stime: stime_temp
+        etime: etime_temp
+        tenantid: tenantid_temp
+        filter_monitored: yes
+        interval: interval_temp
+        direction: all
+    body: body_temp
+    config:
+        maxlatency: 10000
+        minbodysize: 200
+    baseline:
+        tps: 1
+

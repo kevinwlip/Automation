@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.0 r1840935">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
+      <stringProp name="TestPlan.comments">Followed this Guide --&gt; https://www.blazemeter.com/blog/rest-api-testing-how-to-do-it-right</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
+        <collectionProp name="HeaderManager.headers">
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Content-Type</stringProp>
+            <stringProp name="Header.value">application/json</stringProp>
+          </elementProp>
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Accept</stringProp>
+            <stringProp name="Header.value">application/json, text/plain, */*</stringProp>
+          </elementProp>
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Authorization</stringProp>
+            <stringProp name="Header.value">Bearer ${authtoken}</stringProp>
+          </elementProp>
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Accept-Language</stringProp>
+            <stringProp name="Header.value">en-US,en;q=0.8</stringProp>
+          </elementProp>
+        </collectionProp>
+      </HeaderManager>
+      <hashTree/>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined - Environment" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="tpsfile" elementType="Argument">
+            <stringProp name="Argument.name">tpsfile</stringProp>
+            <stringProp name="Argument.value">${__P(tpsfile)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">NEED to fill in a respective .jtl file path for manual run</stringProp>
+          </elementProp>
+          <elementProp name="authtoken" elementType="Argument">
+            <stringProp name="Argument.name">authtoken</stringProp>
+            <stringProp name="Argument.value">${__P(authtoken)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">NEED to fill in an authentication token for manual run, default should use the staging token</stringProp>
+          </elementProp>
+          <elementProp name="protocol" elementType="Argument">
+            <stringProp name="Argument.name">protocol</stringProp>
+            <stringProp name="Argument.value">${__P(protocol,https)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="server" elementType="Argument">
+            <stringProp name="Argument.name">server</stringProp>
+            <stringProp name="Argument.value">${__P(server,staging.zingbox.com)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Default should be &apos;staging.zingbox.com&apos;</stringProp>
+          </elementProp>
+          <elementProp name="apiversion" elementType="Argument">
+            <stringProp name="Argument.name">apiversion</stringProp>
+            <stringProp name="Argument.value">v0.3</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="tenantid" elementType="Argument">
+            <stringProp name="Argument.name">tenantid</stringProp>
+            <stringProp name="Argument.value">${__P(tenantid,baycare)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Default should be &apos;baycare&apos;</stringProp>
+          </elementProp>
+          <elementProp name="port" elementType="Argument">
+            <stringProp name="Argument.name">port</stringProp>
+            <stringProp name="Argument.value">${__P(port,443)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined - API Configuration" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="endpoint" elementType="Argument">
+            <stringProp name="Argument.name">endpoint</stringProp>
+            <stringProp name="Argument.value">${__P(endpoint)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Look in PreProcessor and comment/uncomment line to run on GUI or cmdline</stringProp>
+          </elementProp>
+          <elementProp name="header-params" elementType="Argument">
+            <stringProp name="Argument.name">header-params</stringProp>
+            <stringProp name="Argument.value">${__P(header-params)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Look in PreProcessor and comment/uncomment line to run on GUI or cmdline</stringProp>
+          </elementProp>
+          <elementProp name="deviceid" elementType="Argument">
+            <stringProp name="Argument.name">deviceid</stringProp>
+            <stringProp name="Argument.value">${__P(deviceid)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="maxlatency" elementType="Argument">
+            <stringProp name="Argument.name">maxlatency</stringProp>
+            <stringProp name="Argument.value">${__P(maxlatency,10000)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Default value of &apos;10000&apos; ms for manual run</stringProp>
+          </elementProp>
+          <elementProp name="minbodysize" elementType="Argument">
+            <stringProp name="Argument.name">minbodysize</stringProp>
+            <stringProp name="Argument.value">${__P(minbodysize,200)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">Default value of &apos;200&apos; bytes for manual run</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
+      <com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup guiclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroupGui" testclass="com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup" testname="bzm - Arrivals Thread Group" enabled="true">
+        <elementProp name="ThreadGroup.main_controller" elementType="com.blazemeter.jmeter.control.VirtualUserController"/>
+        <stringProp name="ThreadGroup.on_sample_error">stoptestnow</stringProp>
+        <stringProp name="TargetLevel">100</stringProp>
+        <stringProp name="RampUp">100</stringProp>
+        <stringProp name="Steps">100</stringProp>
+        <stringProp name="Hold">5</stringProp>
+        <stringProp name="LogFilename"></stringProp>
+        <stringProp name="Iterations"></stringProp>
+        <stringProp name="ConcurrencyLimit"></stringProp>
+        <stringProp name="Unit">S</stringProp>
+      </com.blazemeter.jmeter.threads.arrivals.ArrivalsThreadGroup>
+      <hashTree>
+        <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="TPS PreProcessor" enabled="true">
+          <stringProp name="scriptLanguage">groovy</stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="cacheKey">true</stringProp>
+          <stringProp name="script">
+/*  
+ *  Author: Kevin Ip
+ *  Date: March 6th 2019
+ *  
+ *  JSR223 PreProcessor script in Groovy which can be run manually or by command line by commenting/uncommenting lines below  
+ *  
+ *  Obtains passed values from Pytest script which were obtained from &apos;endpoints.yaml&apos;
+ *  Processes the key value pairs and updates the &apos;TPS Request&apos; Sampler 
+ *  Also updates &apos;TPS Request&apos; Sampler with &apos;zbatn#: zbatv#&apos; pairs which account for additional headers from &apos;endpoints.yaml&apos;
+ *  
+ *  Uncomment log.info() statements to see values passed in &apos;Log Viewer&apos; beneath this script window
+*/  
+
+
+log.info(&quot;START TESTING&quot;)
+log.info(&quot;START TESTING&quot;)
+log.info(&quot;START TESTING&quot;)
+
+log.info(&quot;Server tested: &quot; + vars.get(&quot;server&quot;))
+log.info(&quot;Tenantid tested: &quot; + vars.get(&quot;tenantid&quot;))
+
+
+def endpoint = vars.get(&quot;endpoint&quot;)
+def header = vars.get(&quot;header-params&quot;)
+if (endpoint == &apos;1&apos;) {   // ### Did not obtain a value from command-line ###
+	log.info(&quot;Running on GUI&quot;)
+	
+	// *** Use one of these headers if running on this JMeter GUI ***
+	//endpoint = &quot;dashboard/series&quot; // (1)
+	endpoint = &quot;iotprofile/stats&quot;   // (2)
+	//endpoint = &quot;dashboard/stat&quot;   // (3)
+
+	// *** Use respective header param and update the &apos;stime&apos; and &apos;etime&apos; in the future for successful api calls !!! ***
+	// ### For testing dashboard/series (1) ###
+	//header = &quot;{etime:now,direction:all,stime:2019-03-03T12:00Z,interval:hour,filter_monitored:True,tenantid:testing-soho}&quot; 
+	
+	// ### For testing iotprofile/stats (2) ###
+	header = &quot;{etime:now,direction:all,stime:2019-03-05T12:00Z,interval:minutes,filter_monitored:True,tenantid:baycare,outputtype:site}&quot;
+	
+	// ### For testing dashboard/stats (3) ###
+	//header = &quot;{etime:now,direction:all,stime:2019-03-05T12:00Z,interval:hour,filter_monitored:True,tenantid:testing-soho}&quot;
+}
+
+
+log.info(&quot;endpoint: &quot; + endpoint)
+log.info(&quot;header: &quot; + header + &quot; &quot; + header.getClass())
+
+vars.put(&quot;endpoint&quot;, endpoint)
+
+def header_split = header.split(&apos;,&apos;)
+def split_size = header_split.size()
+//log.info(&quot;header_split = &quot; + header_split + &quot; &quot; + header_split.getClass())
+//log.info(&quot;split_size = &quot; + split_size + &quot; &quot; + split_size.getClass())
+
+def header_str = header_split =~ /(\w+?):(.+?)[,}]/
+//log.info(&quot;first header string name = &quot; + header_str[0][1] + &quot; &quot; + header_str.getClass())
+//log.info(&quot;first header string value = &quot; + header_str[0][2] + &quot; &quot; + header_str.getClass())
+
+// Updates TPS Request with values from Pytest script/&apos;endpoints.yaml&apos;
+def param_count = 0
+def param_list = []
+while (param_count != split_size) {
+	vars.put(&quot;pname&quot;+param_count, header_str[param_count][1])
+	vars.put(&quot;pvalue&quot;+param_count, header_str[param_count][2])
+	param_list.add(header_str[param_count][1]+&apos;:&apos;+header_str[param_count][2])
+	param_count += 1
+	
+	//log.info(&quot;param_count is &quot; + param_count)
+	//log.info(&quot;param_list is &quot; + param_list)
+}
+
+// Updates TPS Request with &apos;zbatn#:zbatv#&apos; pairs, pairs don&apos;t affect request but are needed for additional headers from endpoints.yaml
+while (param_count &lt; 15) {
+	param_count as String
+	
+	if (vars.get(&quot;pname&quot;+param_count) == null) {
+		vars.put(&quot;pname&quot;+param_count, &quot;zbatn&quot;+param_count)
+		vars.put(&quot;pvalue&quot;+param_count, &quot;zbatv&quot;+param_count)
+		
+		//log.info(&quot;Updating &quot; + &quot;parameter name &quot;+param_count + &quot; and parameter value &quot;+param_count)
+		//log.info(&quot;New parameter name is: &quot; + vars.get(&quot;pname&quot;+param_count) + &quot; and new parameter value is: &quot; + vars.get(&quot;pvalue&quot;+param_count))
+	}
+	
+	param_count as Integer
+	param_count += 1
+	param_count as String
+}
+/*
+int activeThreadCount = org.apache.jmeter.threads.JMeterContextService.getNumberOThreads()
+log.info(&quot;ACTIVE THREADS: &quot; + activeThreadCount)
+log.info(&quot;ACTIVE THREADS: &quot; + activeThreadCount)
+log.info(&quot;ACTIVE THREADS: &quot; + activeThreadCount)
+*/
+log.info(&quot;END TESTING&quot;)
+log.info(&quot;END TESTING&quot;)
+log.info(&quot;END TESTING&quot;)
+
+
+
+</stringProp>
+          <stringProp name="TestPlan.comments">Required to parse endpoint values from Python test</stringProp>
+        </JSR223PreProcessor>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="TPS Request" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="${pname0}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue0}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname0}</stringProp>
+              </elementProp>
+              <elementProp name="${pname1}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue1}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname1}</stringProp>
+              </elementProp>
+              <elementProp name="${pname2}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue2}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname2}</stringProp>
+              </elementProp>
+              <elementProp name="${pname3}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue3}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname3}</stringProp>
+              </elementProp>
+              <elementProp name="${pname4}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue4}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname4}</stringProp>
+              </elementProp>
+              <elementProp name="${pname5}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue5}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname5}</stringProp>
+              </elementProp>
+              <elementProp name="${pname6}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue6}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname6}</stringProp>
+              </elementProp>
+              <elementProp name="${pname7}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue7}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname7}</stringProp>
+              </elementProp>
+              <elementProp name="${pname8}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue8}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname8}</stringProp>
+              </elementProp>
+              <elementProp name="${pname9}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue9}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname9}</stringProp>
+              </elementProp>
+              <elementProp name="${pname10}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue10}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname10}</stringProp>
+              </elementProp>
+              <elementProp name="${pname11}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue11}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname11}</stringProp>
+              </elementProp>
+              <elementProp name="${pname12}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue12}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname12}</stringProp>
+              </elementProp>
+              <elementProp name="${pname13}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue13}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname13}</stringProp>
+              </elementProp>
+              <elementProp name="${pname14}" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">${pvalue14}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">${pname14}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${server}</stringProp>
+          <stringProp name="HTTPSampler.port">${port}</stringProp>
+          <stringProp name="HTTPSampler.protocol">${protocol}</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/${apiversion}/api/${endpoint}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout">3000</stringProp>
+          <stringProp name="HTTPSampler.response_timeout">60000</stringProp>
+          <stringProp name="TestPlan.comments">Request parameters will be populated by the TPS PreProcessor</stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="Duration Assertion" enabled="true">
+            <stringProp name="DurationAssertion.duration">${maxlatency}</stringProp>
+          </DurationAssertion>
+          <hashTree/>
+          <SizeAssertion guiclass="SizeAssertionGui" testclass="SizeAssertion" testname="Size Assertion" enabled="true">
+            <stringProp name="Assertion.test_field">SizeAssertion.response_data</stringProp>
+            <stringProp name="SizeAssertion.size">${minbodysize}</stringProp>
+            <intProp name="SizeAssertion.operator">3</intProp>
+          </SizeAssertion>
+          <hashTree/>
+        </hashTree>
+        <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.TransactionsPerSecondGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - TPS" enabled="true">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <threadCounts>true</threadCounts>
+              <sampleCount>true</sampleCount>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename">${tpsfile}</stringProp>
+          <longProp name="interval_grouping">1000</longProp>
+          <boolProp name="graph_aggregated">true</boolProp>
+          <stringProp name="include_sample_labels"></stringProp>
+          <stringProp name="exclude_sample_labels"></stringProp>
+          <stringProp name="start_offset"></stringProp>
+          <stringProp name="end_offset"></stringProp>
+          <boolProp name="include_checkbox_state">false</boolProp>
+          <boolProp name="exclude_checkbox_state">false</boolProp>
+          <stringProp name="TestPlan.comments">Analyzes TPS and creates the tps file needed for Pytest</stringProp>
+        </kg.apc.jmeter.vizualizers.CorrectedResultCollector>
+        <hashTree/>
+        <DebugSampler guiclass="TestBeanGUI" testclass="DebugSampler" testname="Debug Sampler" enabled="false">
+          <boolProp name="displayJMeterProperties">true</boolProp>
+          <boolProp name="displayJMeterVariables">true</boolProp>
+          <boolProp name="displaySystemProperties">true</boolProp>
+          <stringProp name="TestPlan.comments">Sampler viewable in &apos;View Results Tree&apos; and used to see what JMeter properties, JMeter variables, and System properties are passed into JMeter</stringProp>
+        </DebugSampler>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <threadCounts>true</threadCounts>
+              <sampleCount>true</sampleCount>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="false">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <threadCounts>true</threadCounts>
+              <sampleCount>true</sampleCount>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="false">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>true</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <threadCounts>true</threadCounts>
+              <sampleCount>true</sampleCount>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <TestAction guiclass="TestActionGui" testclass="TestAction" testname="Flow Control Action" enabled="true">
+          <intProp name="ActionProcessor.action">0</intProp>
+          <intProp name="ActionProcessor.target">0</intProp>
+          <stringProp name="ActionProcessor.duration">0</stringProp>
+          <stringProp name="TestPlan.comments">This is required to run through all TPS tests</stringProp>
+        </TestAction>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
