@@ -1,7 +1,0 @@
-To use mock-server:
-
-1. Install package.json by running "npm install /path/to/thisfolder/"
-
-2. Run mockserver by running "node mockserver.js"
-
-3. Add expectations (request/response pairs) by adding javascript files into this folder, consult expectations_sample.js
