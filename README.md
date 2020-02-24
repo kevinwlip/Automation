@@ -6,7 +6,7 @@ git checkout https://github.com/kevinwlip/Automation.git
 
 QA Automation setup
 -------------------
-Objective: Setup zbat project for automation test
+Objective: Setup automation project for automation test
 
 ### 1. Setup environment variable
 Setup environment vaiables for node env, zbat project path and jmeter path.
