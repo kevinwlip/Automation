@@ -1,0 +1,3 @@
+#add production settings here
+mongo:
+  hosts: ['staging-m1-rt001.cloud.zingbox.com:27017','staging-m1-rt002.cloud.zingbox.com:27017']
