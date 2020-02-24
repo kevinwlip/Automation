@@ -1,0 +1,686 @@
+import re
+from enum import Enum
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
+from common.zbSelenium import zbSelenium
+from selenium.common.exceptions import StaleElementReferenceException, NoSuchElementException
+from ui.zbUILogin import Login
+from ui.zbUIShared import clickEachDashboardTimerange, waitLoadProgressDone, waitSeriesGraphDone, verifyDataTimerange, gotoBasePage, verifyLinkToDeviceDetail, verifyLinkToAppDetail, selectSingleSite
+from locator.navigator import NavMenuLocators
+from common.zbCommon import validateDataNotEmpty
+import pdb, time
+import time
+
+
+# global CSS parameters for UI Dashboard
+CSS_RISK_DEVICES = "div.risk-row div.risk-number.flex"
+CSS_TOTAL_RISK_DEVICES = "div[name='Navigate to active device list from dashboard summary']"
+
+CSS_ALL_DEVICES_BY_CATEGORY = "div.listing_name.ng-binding"
+CSS_ALL_DEVICES_BY_NUMBER = "div.listing_number.ng-binding"
+CSS_OPEN_LIST_BUTTON = "div.dot_list"
+CSS_CATEGORY_DROPDOWN_BUTTON = "button[name='Open Category dropdown']"
+CSS_OS_DROPDOWN_BUTTON ="button[name='Open Operating System dropdown']"
+CSS_DEVICES_BY_CATEGORY_BUTTON = "button[name='Open Category in Category']"
+CSS_DEVICES_BY_OS_BUTTON = "button[name='Open Operating System in Category']"
+CSS_DEVICES_BY_SUBNET_BUTTON = "button[name='Open Subnet/VLAN in Operating System']"
+
+CSS_NETWORK_SUMMARY_DEVICES = "div[class='number']"
+# CSS_NETWORK_SUMMARY_DEVICES = "div.count.ng-binding"
+CSS_DATA_USAGE_NUMBER = "div.big-number"
+
+CSS_SITE_ALL = "div.grouping-card.site"
+CSS_ALL_SITES_SELECT_BUTTON = "div.multiselect-circle"
+CSS_SITES_IOT_DEVICES = "div.selected > div[layout='row'] > div[aria-hidden='false'] > div.mbutton.layout-align-space-between-center >span[ng-click]"
+CSS_IOT_DROPDOWN_DEVICES = "button[class='selector-menu-button md-button md-ink-ripple layout-align-space-between-center layout-row'] > span.iot-number"
+
+CSS_TOP_DEVICES_DROPDOWN_ARROW = "zing-dashboard-network[connection-type='device']> md-card >md-card-title >div > div>md-select[ng-model = 'dashNetworkCtrl.selectedDropdown'] > md-select-value > span.md-select-icon"
+CSS_TOP_APPS_DROPDOWN_ARROW = "zing-dashboard-network[connection-type='app']> md-card >md-card-title >div > div>md-select[ng-model = 'dashNetworkCtrl.selectedDropdown'] > md-select-value > span.md-select-icon"
+CSS_TOP_DEV_APPS_DROPDOWN_SELECT = "div[class='md-select-menu-container md-active md-clickable'] >md-select-menu>md-content[class='_md'] > md-option div.md-text.ng-binding"
+CSS_TOP_DEVICES_LIST_NUMBERS = "zing-dashboard-network.left.height-ie-item> md-card > md-card-content > div > div > div > div.list-item-data.ng-binding"
+CSS_TOP_DEVICE_LINK = 'span[name="Navigate to item key from the Devices widget"]'
+
+CSS_TOP_APPS_LIST_NUMBERS = "zing-dashboard-network.right.height-ie-item> md-card > md-card-content > div > div > div > div.list-item-data.ng-binding"
+CSS_TOP_APP_LINK = 'span[name="Navigate to item key from the Protocols widget"]'
+
+CSS_CATEGORIES_FILTER = "button[ng-click = \"profileSelectorCtrl.setGroupingView('category')\"]"
+CSS_CAT_PROF_SELECTIONS = "div.grouping-card.group"
+CSS_CAT_PROF_NUMBER_OF_DEVICES = "span[ng-bind='item.count | prettyPrintNumber']"
+CSS_EDIT_FILTER = "span[ng-click='profileSelectorCtrl.setEditMode(true);']"
+CSS_PROFILES_FILTER = "button[ng-click = \"profileSelectorCtrl.setGroupingView('profile')\"]"
+
+CSS_FILTER_ALL_CARD = "div.grouping-card.all.selected"
+
+CSS_EXTERNAL_ENDPOINT_COUNT = "zing-map-base md-card-title .title-text .ng-binding"
+CSS_EXTERNAL_ENDPOINT_CATEGORY_DROPDOWN_BUTTON = "zing-map-base md-card-title md-select.mr16"
+CSS_EXTERNAL_ENDPOINT_CATEGORY_FORMATTED_STR = "[name='Geo Map'][value='{}'][role='option']" 
+CSS_EXTERNAL_ENDPOINT_REGION_NAME = "zing-map-base #mapTooltip p.title"
+CSS_EXTERNAL_ENDPOINT_TOOLTIP_ACTIVE_NUMBER = "zing-map-base #mapTooltip p.zing-link"
+CSS_EXTERNAL_ENDPOINT_EQUATOR_REGION = "zing-map-base #mapSVG #cgeo228"
+CSS_EXTERNAL_ENDPOINT_CANADA = "zing-map-base #mapSVG #cgeo38"
+CSS_EXTERNAL_ENDPOINT_CHINA = "zing-map-base #mapSVG #cgeo41"
+CSS_EXTERNAL_ENDPOINT_DETAILS_PAGE_TITLE = ".zingTable .table-title .title"
+
+CSS_EXTERNAL_ENDPOINT_MAP_ZOOM_LEVEL = "#mapSVG .boundary"
+CSS_EXTERNAL_ENDPOINT_MAP_ZOOM_IN_BUTTON = "zing-map-base .zoom-item button#zoomIn"
+CSS_EXTERNAL_ENDPOINT_MAP_ZOOM_OUT_BUTTON = "zing-map-base .zoom-item button#zoomOut"
+CSS_DEVICE_OTHER_COUNT = ".industry-number.ng-scope.ng-binding[ng-bind='profileSelectorCtrl.others_total | prettyPrintNumber']" #"[aria-label='Other industry count'] span.industry-number.ng-binding"
+CSS_DEVICE_BUTTON = "md-menu.iot-selection.md-menu"
+CSS_IOT_SELECTOR_MENU = "[ng-repeat='iotitem in profileSelectorCtrl.iotList track by iotitem.name'] .iot-menu-button"
+
+class ZOOM_DIRECTION(Enum):
+	IN = 'zoom_in',
+	OUT = 'zoom_out'
+
+
+class Dashboard():
+
+	def __init__(self, **kwargs):
+		self.params = kwargs
+		self.selenium = Login(**kwargs).login()
+		self.baseurl = kwargs["url"]+'/'
+		'''
+		After login, user will be at dashboard.
+		Calling dashboard after is redundant, even for cases where login does not go to dashboard
+		(for example deployment user)
+		because that is handled by login method from zbUILogin
+		
+		# self.gotoDashboard()
+		'''
+
+	def gotoDashboard(self):
+		url = urlparse(self.params["url"])
+		rcode = self.selenium.getURL(url.scheme+'://'+url.netloc)
+		waitLoadProgressDone(self.selenium)
+
+
+	def checkTimeSeries(self, specific=False): 
+		gotoBasePage(self.selenium)
+
+		for result in (clickEachDashboardTimerange(browserobj=self.selenium, specific=specific)):				
+			if result["pass"]:
+
+				# wait for complete load and check series graph present.
+				rcode = waitLoadProgressDone(self.selenium)
+				if rcode:
+					data = waitSeriesGraphDone(self.selenium)
+				
+				# verify data
+				if data:
+					rcode = verifyDataTimerange(result["time"], data, strict=self.params["comparestrict"], month_retention=True)
+				else: 
+					print("Traffic series did not find any data")
+					return False
+
+				if not rcode: 
+					print("Traffic series for "+str(result["time"])+" has only "+str(len(data))+" bars.")
+					return False
+			else:
+				return False
+		return True
+
+
+	def verifyRiskAssementDevices(self):
+		self.gotoDashboard()
+
+		kwargs1 = {}
+		kwargs1["selector"] = CSS_SITE_ALL
+		rcode = self.selenium.findSingleCSS(**kwargs1)
+		rcode.click()
+
+		kwargs = {}    
+		sumDevices = 0
+		kwargs["selector"] = CSS_RISK_DEVICES
+		rcode = self.selenium.findMultiCSS(**kwargs)
+
+		for i in range(0,len(rcode)):
+			intgr = rcode[i]
+			intgr = int(intgr.text.replace(',',''))
+			sumDevices = sumDevices + intgr
+
+			if intgr < 0:
+				return False
+
+		kwargs["selector"] = CSS_TOTAL_RISK_DEVICES
+		rcode = self.selenium.findSingleCSS(**kwargs)
+		rcode = int(rcode.text.replace(',',''))
+		
+		if sumDevices != rcode:
+			print("Risk devices and total do not match up")
+			print("SUM: " + str(sumDevices) + " | TOTAL: " + str(rcode))
+			return False
+
+		kwargs["selector"] = CSS_IOT_DROPDOWN_DEVICES
+		rcode = self.selenium.findSingleCSS(**kwargs)
+		rcode = int(rcode.text.replace(',',''))
+
+		if sumDevices != rcode:
+			print("Risk devices and total Device count do not match up")
+			print("TOTAL SUM: " + str(sumDevices) + " | TOTAL DEVICES: " + str(rcode))
+			return False
+
+		return True
+
+
+	def verifyDevicesByCategory(self):
+		self.gotoDashboard()
+		kwargs = {}
+		cssDeviceDropdown = [CSS_DEVICES_BY_CATEGORY_BUTTON,CSS_DEVICES_BY_OS_BUTTON,CSS_DEVICES_BY_SUBNET_BUTTON]
+
+		for devicesDropdown in cssDeviceDropdown:
+			totalPercent = 0
+			totalDevices = 0
+			percentList = []
+
+			#clicks on dropdown arrow
+			if devicesDropdown == CSS_DEVICES_BY_SUBNET_BUTTON:
+				kwargs["selector"] = CSS_OS_DROPDOWN_BUTTON
+				rcode = self.selenium.click(**kwargs)
+			else:
+				kwargs["selector"] = CSS_CATEGORY_DROPDOWN_BUTTON
+				rcode = self.selenium.click(**kwargs)
+
+			#clicks on category,OS,or subnet
+			kwargs["selector"] = devicesDropdown
+			kwargs["waittype"] = "visibility"
+			rcode = self.selenium.waitCSS(**kwargs)
+			if rcode:
+				rcode = self.selenium.click(**kwargs)
+
+			kwargs["selector"] = CSS_OPEN_LIST_BUTTON
+			rcode = self.selenium.click(**kwargs)
+
+			#determines precentage total
+			kwargs["selector"] = CSS_ALL_DEVICES_BY_CATEGORY
+			rcode = self.selenium.findMultiCSS(**kwargs)
+
+			for i in rcode:
+				i = i.text
+				i = i[i.find("(") + 1: i.find("%")]
+				i = int(i)
+				totalPercent = totalPercent + i
+				percentList.append(i)
+			
+			if totalPercent >= 100 & totalPercent <= 105:
+				pass
+			else:
+				print("Total percentage is off")
+				return False
+
+			#determines total number of devices
+			kwargs["selector"] = CSS_ALL_DEVICES_BY_NUMBER
+			rcode = self.selenium.findMultiCSS(**kwargs)
+			for i in rcode:
+				i = int(i.text)
+				totalDevices = totalDevices + i
+
+			#checks to see if number of devices correspond to percentage
+			n = 0
+			for i in rcode:
+				i = int(i.text)
+				checkPercent = round(100 * (i / totalDevices))
+				if  checkPercent == percentList[n]:
+					pass
+				else: 
+					print("Number of devices do not match with percentage")
+					return False
+				n = n + 1
+
+		return True
+
+
+	def verifyNetworkSummary(self):
+		self.gotoDashboard()
+		kwargs = {}
+		kwargs["selector"] = NavMenuLocators.CSS_NETWORK_SUMMARY_DEVICES
+		rcode = self.selenium.findMultiCSS(**kwargs)
+		for i in rcode:
+			i = int(i.text)
+			if i >= 0:
+				kwargs["selector"] = CSS_DATA_USAGE_NUMBER
+				rcode = self.selenium.findSingleCSS(**kwargs)
+				rcode = rcode.text
+				if rcode <= 0:
+					print("Network Summary Data Usage not found")
+					return False
+			else:
+				print("Network Summary missing device count")
+				return False
+		return True
+
+	def verifyAllSites(self):
+		self.gotoDashboard()
+		kwargs1,kwargs2,kwargs3 = {},{},{}
+		kwargs1["selector"] = CSS_ALL_SITES_SELECT_BUTTON
+		rcode = self.selenium.findMultiCSS(**kwargs1)
+
+		for i in rcode:
+			
+			i.click()#clicks single site
+			waitLoadProgressDone(self.selenium)
+			kwargs2["selector"] = CSS_SITES_IOT_DEVICES
+			rcode = self.selenium.findSingleCSS(**kwargs2)
+			rcode = int(rcode.text)
+
+			kwargs3["selector"] = CSS_IOT_DROPDOWN_DEVICES
+			rcodeI = self.selenium.findSingleCSS(**kwargs3)
+			rcodeI = int(rcodeI.text.replace(',',''))
+
+			if rcode != rcodeI:
+				self.selenium.click(selector=CSS_IOT_DROPDOWN_DEVICES)
+				self.selenium.executeScript("arguments[0].click();", err_msg = "wayt", selector=CSS_IOT_SELECTOR_MENU)#.click()
+				number = self.selenium.findSingleCSS(selector=CSS_DEVICE_OTHER_COUNT)
+				time.sleep(1)
+				othercount = int(number.text)
+				if rcodeI - othercount != rcode:
+					print("Site card count "+str(rcode) + " not equal to device count "+str(rcodeI) + "(-" + str(othercount) + ")") 
+					return False
+				actions = ActionChains(self.selenium.driver)
+				actions.send_keys(Keys.ESCAPE)
+				actions.perform()
+				waitLoadProgressDone(self.selenium)
+			# click again to deselect site
+			i.click()
+		return True
+
+
+	def verifyTopDevices(self):
+		self.gotoDashboard()
+		kwargs = {}
+		sitesList = []
+
+		# select a single site to enable Top Device
+		result = selectSingleSite(self.selenium)
+		if result:
+			sites = result[0] 
+			site = result[1]
+		else:
+			print("Not able to select a valid site to enable Top Device widget")
+
+		# click on Top Device drop down button
+		waitLoadProgressDone(self.selenium)
+		kwargs = {"selector": CSS_TOP_DEVICES_DROPDOWN_ARROW,"waittype" : "visibility"}
+		button = self.selenium.findSingleCSS(**kwargs)
+		button.click()
+
+		kwargs = {"selector": CSS_TOP_DEV_APPS_DROPDOWN_SELECT,"waittype" : "visibility"}
+		self.selenium.waitCSS(**kwargs)
+		filterby = self.selenium.findMultiCSS(**kwargs)
+		if not filterby:
+			print("Top Devices drop down did not contain anything")
+			return False
+		filterby[0].click()
+		waitLoadProgressDone(self.selenium)
+
+		for item in filterby:
+			button.click()
+			waitLoadProgressDone(self.selenium)
+			item.click()
+			
+			kwargs["selector"] = CSS_TOP_DEVICES_LIST_NUMBERS
+			devlist = self.selenium.findMultiCSS(**kwargs)
+			if not devlist:
+				print("Top Devices did not find any devices")
+				return False
+
+			for dev in devlist:
+				if not dev.text or dev.text == '':
+					print("Top Devices has list entry with empty data")
+					return False
+
+		# check device link to make sure it's valid
+		rcode = verifyLinkToDeviceDetail(self.selenium, CSS_TOP_DEVICE_LINK)
+		if not rcode:
+			print("Top Devices link to Device Detail is not working")
+			return False
+		else:
+			gotoBasePage(self.selenium)
+
+		try:
+			site.click()
+			waitLoadProgressDone(self.selenium)
+		except (StaleElementReferenceException, NoSuchElementException):
+			pass
+
+		return True
+
+
+	def verifyTopApps(self):
+		self.gotoDashboard()
+		kwargs = {}
+
+		# select a single site to enable Top Apps
+		result = selectSingleSite(self.selenium)
+		if result:
+			sites = result[0] 
+			site = result[1]
+		else:
+			print("Not able to select a valid site to enable Top Applications widget")
+
+		# click on Top Apps drop down button
+		waitLoadProgressDone(self.selenium)
+		kwargs = {"selector": CSS_TOP_APPS_DROPDOWN_ARROW,"waittype" : "visibility"}
+		button = self.selenium.findSingleCSS(**kwargs)
+		button.click()
+
+		kwargs = {"selector": CSS_TOP_DEV_APPS_DROPDOWN_SELECT,"waittype" : "visibility"}
+		self.selenium.waitCSS(**kwargs)
+		filterby = self.selenium.findMultiCSS(**kwargs)
+		if not filterby:
+			print("Top app drop down did not contain anything")
+			return False
+
+		filterby[0].click()
+		waitLoadProgressDone(self.selenium)
+
+		for item in filterby:
+			button.click()
+			waitLoadProgressDone(self.selenium)
+			item.click()
+			
+			kwargs["selector"] = CSS_TOP_APPS_LIST_NUMBERS
+			applist = self.selenium.findMultiCSS(**kwargs)
+			if not applist:
+				print("Top app did not find any app")
+				return False
+
+			for app in applist:
+				if not app.text or app.text == '':
+					print("Top App has list entry with empty data")
+					return False
+
+		# check app link to make sure it's valid
+		rcode = verifyLinkToAppDetail(self.selenium, CSS_TOP_APP_LINK)
+		if not rcode:
+			print("Top Devices link to App Detail is not working")
+			return False
+		else:
+			gotoBasePage(self.selenium)
+
+		try:
+			#site[0].click()
+			site.click()
+			waitLoadProgressDone(self.selenium)
+		except StaleElementReferenceException:
+			pass
+
+		return True
+
+
+
+	def verifyCategories(self):
+		self.gotoDashboard()
+		kwargs = {}
+		elementNum = 0
+		deviceList = []
+		categoryNames = []
+		rcodeText = []
+
+		#clicks on the category filter
+		kwargs["selector"] = CSS_CATEGORIES_FILTER
+		rcode = self.selenium.findSingleCSS(**kwargs)
+		rcode.click()
+
+		# set filter to all
+		kwargs["selector"] = CSS_FILTER_ALL_CARD
+		self.selenium.click(**kwargs)
+		waitLoadProgressDone(self.selenium)
+
+		#creates a list for the number of devices per category
+		kwargs["selector"] = CSS_CAT_PROF_NUMBER_OF_DEVICES
+		rcodeList = self.selenium.findMultiCSS(**kwargs)
+		for i in rcodeList:
+			i = int(i.text)
+			deviceList.append(i)
+
+		#creates a list of all the categories to be matched
+		kwargs["selector"] = CSS_CAT_PROF_SELECTIONS
+		rcode = self.selenium.findMultiCSS(**kwargs)
+		for i in rcode:
+			i = i.text
+			categoryNames.append(i)
+		#print categoryNames
+
+		# only go through 2 categories
+		for i in categoryNames[0:2]:
+			#selects each category by matching the element to CategoryNames(i)
+			kwargs["selector"] = CSS_CAT_PROF_SELECTIONS
+			rcode = self.selenium.findMultiCSS(**kwargs)
+			for j in rcode:
+				j = j.text
+				rcodeText.append(j)
+			index = rcodeText.index(i)
+			rcode = rcode[index]
+			rcode.click()
+			
+			rcode = waitLoadProgressDone(self.selenium)
+			if rcode:
+				kwargs["selector"] = CSS_TOTAL_RISK_DEVICES
+			#checks to see if the total devices match the number of devices given
+			rcode = self.selenium.findSingleCSS(**kwargs)
+			rcode = int(rcode.text)
+			if rcode == deviceList[elementNum]:
+				pass
+			else:
+				print("Devices did not match")
+				print(str(rcode) + " vs " + str(deviceList[elementNum]))
+				return False
+
+			#returns back to the main page
+			kwargs["selector"] = CSS_EDIT_FILTER
+			rcode = self.selenium.findSingleCSS(**kwargs)
+			rcode.click()
+
+			elementNum = elementNum + 1
+
+		gotoBasePage(self.selenium)
+		return True
+
+	def verifyProfiles(self):
+		self.gotoDashboard()
+		kwargs = {}
+		elementNum = 0
+		deviceList = []
+		categoryNames = []
+		rcodeText = []
+
+		#clicks on the profile filter
+		kwargs["selector"] = CSS_PROFILES_FILTER
+		rcode = self.selenium.findSingleCSS(**kwargs)
+		rcode.click()
+
+		# set filter to all
+		kwargs["selector"] = CSS_FILTER_ALL_CARD
+		self.selenium.click(**kwargs)
+		waitLoadProgressDone(self.selenium)
+
+		#creates a list for the number of devices per profile
+		kwargs["selector"] = CSS_CAT_PROF_NUMBER_OF_DEVICES
+		rcodeList = self.selenium.findMultiCSS(**kwargs)
+		for i in rcodeList:
+			i = int(i.text)
+			deviceList.append(i)
+
+		#creates a list of all the profile to be matched
+		kwargs["selector"] = CSS_CAT_PROF_SELECTIONS
+		rcode = self.selenium.findMultiCSS(**kwargs)
+		for i in rcode:
+			i = i.text
+			categoryNames.append(i)
+		#print categoryNames
+
+		# limiting down to testing just 2 categories
+		categoryNames = categoryNames[0:2]
+
+		for i in categoryNames:
+			#selects each category by matching the element to profileNames(i)
+			kwargs["selector"] = CSS_CAT_PROF_SELECTIONS
+			rcode = self.selenium.findMultiCSS(**kwargs)
+			for j in rcode:
+				j = j.text
+				rcodeText.append(j)
+			index = rcodeText.index(i)
+			rcode = rcode[index]
+			rcode.click()
+			
+			rcode = waitLoadProgressDone(self.selenium)
+			if rcode:
+				kwargs["selector"] = CSS_TOTAL_RISK_DEVICES
+			#checks to see if the total devices match the number of devices given
+			rcode = self.selenium.findSingleCSS(**kwargs)
+			rcode = int(rcode.text)
+			if rcode == deviceList[elementNum]:
+				pass
+			else:
+				print("Total Devices: {}".format(rcode))
+				print("Number of Devices given: {}".format(deviceList[elementNum]))
+				print("Devices did not match")
+				return False
+
+			#returns back to the main page
+			kwargs["selector"] = CSS_EDIT_FILTER
+			rcode = self.selenium.findSingleCSS(**kwargs)
+			rcode.click()
+
+			elementNum = elementNum + 1
+
+		gotoBasePage(self.selenium)
+		return True
+
+	def verifyExternalEndpointWidget(self):
+		self.gotoDashboard()
+		ret = True
+		try:
+			ret = ret and self._verifyExternalEndpointCount()
+			ret = ret and self._verifySubregionEndpointLinks()
+			ret = ret and self._verifyMapZoom()
+		except:
+			print('External endpoint widget test failed')
+			ret = False
+		return ret
+
+	def _verifyExternalEndpointCount(self):
+		externalEndpointCounts = []
+
+		# Select "All"
+		self._changeExternalEndpointCategory('all')
+		externalEndpointCounts.append(self._getExternalEndpointCount())
+
+		# Select "Inbound"
+		self._changeExternalEndpointCategory('inbound')
+		externalEndpointCounts.append(self._getExternalEndpointCount())
+
+		# Select "Outbound"
+		self._changeExternalEndpointCategory('outbound')
+		externalEndpointCounts.append(self._getExternalEndpointCount())
+
+		for count in externalEndpointCounts:
+			if count < 0:
+				print('External endpoint count is negative')
+				return False
+		return True
+
+	def _verifySubregionEndpointLinks(self):
+		self._changeExternalEndpointCategory('all')
+		self._hoverPossibleRegionsWithEndpoints()
+
+		regionName = self.selenium.getText(selector=CSS_EXTERNAL_ENDPOINT_REGION_NAME)
+		self.selenium.click(selector=CSS_EXTERNAL_ENDPOINT_TOOLTIP_ACTIVE_NUMBER)
+
+		waitLoadProgressDone(self.selenium)
+
+		pageTitle = self.selenium.getText(selector=CSS_EXTERNAL_ENDPOINT_DETAILS_PAGE_TITLE)
+
+		self.gotoDashboard()
+
+		return regionName in pageTitle
+
+	def _verifyMapZoom(self):
+		ret = True
+		try:
+			ret = ret and self._correctlyZoom(ZOOM_DIRECTION.IN)
+			ret = ret and self._correctlyZoom(ZOOM_DIRECTION.OUT)
+		except:
+			print('Map zooms incorrectly')
+			ret = False
+		return ret
+
+	def _changeExternalEndpointCategory(self, category='all'):
+		self.selenium.click(selector=CSS_EXTERNAL_ENDPOINT_CATEGORY_DROPDOWN_BUTTON)
+
+		selector = CSS_EXTERNAL_ENDPOINT_CATEGORY_FORMATTED_STR.format(category)
+		self.selenium.click(selector=selector)
+
+		waitLoadProgressDone(self.selenium)
+
+	def _getExternalEndpointCount(self):
+		endpointCount = self.selenium.getText(selector=CSS_EXTERNAL_ENDPOINT_COUNT)
+		endpointCount = self._convertEndpointCountFromStrToInt(endpointCount)
+		return endpointCount
+
+	def _convertEndpointCountFromStrToInt(self, text):
+		array_of_match = re.findall(r'[0-9][0-9,.]+', text)
+		if array_of_match is None:
+			return ''
+		text = array_of_match[0]
+		text = text.replace(',', '')
+		return int(text)
+
+	def _hoverPossibleRegionsWithEndpoints(self):
+		# FIXME: This serves as a lucky draw to activate map tooltip, should have a better implementation
+		regionsSelectors = [
+			CSS_EXTERNAL_ENDPOINT_EQUATOR_REGION,
+			CSS_EXTERNAL_ENDPOINT_CANADA,
+			CSS_EXTERNAL_ENDPOINT_CHINA
+		]
+		for selector in regionsSelectors:
+			kwargs = {"selector": selector}
+			region = self.selenium.findSingleCSS(**kwargs)
+
+	'''
+	Check if the map zooms correctly in direction
+	param zoomDirection: Either ZOOM_DIRECTION.IN or ZOOM_DIRECTION.OUT, default ZOOM_DIRECTION.IN
+	'''
+	def _correctlyZoom(self, zoomDirection=ZOOM_DIRECTION.IN):
+		beforeZoom = self._getMapZoomLevel()
+		for _ in range(5):
+			self._clickMapZoom(zoomDirection=zoomDirection)
+		waitLoadProgressDone(self.selenium)
+		afterZoom = self._getMapZoomLevel()
+		if zoomDirection == ZOOM_DIRECTION.IN and beforeZoom >= afterZoom:
+			print(('Map did not zoom in\nScale before zoom in {0}\nScale after zoom in {1}'.format(beforeZoom, afterZoom)))
+			return False
+		elif zoomDirection == ZOOM_DIRECTION.OUT and beforeZoom <= afterZoom:
+			print(('Map did not zoom out\nScale before zoom out {0}\nScale after zoom out {1}'.format(beforeZoom, afterZoom)))
+			return False
+		return True
+
+	def _getMapZoomLevel(self):
+		kwargs = {}
+		kwargs["selector"] = CSS_EXTERNAL_ENDPOINT_MAP_ZOOM_LEVEL
+		zoomLevel = self.selenium.findSingleCSS(**kwargs)
+		zoomLevel = zoomLevel.get_attribute('transform')
+
+		array_of_match = re.findall(r'\d*\.*\d+', zoomLevel)
+		if array_of_match is None:
+			print('No zoom level found')
+			return 1.0
+		text = array_of_match[-1]
+		return float(text)
+
+	'''
+	Click map zoom button
+	param zoomDirection: Either ZOOM_DIRECTION.IN or ZOOM_DIRECTION.OUT, default ZOOM_DIRECTION.IN
+	'''
+	def _clickMapZoom(self, zoomDirection=ZOOM_DIRECTION.IN):
+		selector = CSS_EXTERNAL_ENDPOINT_MAP_ZOOM_IN_BUTTON
+		if zoomDirection == ZOOM_DIRECTION.OUT:
+			selector = CSS_EXTERNAL_ENDPOINT_MAP_ZOOM_OUT_BUTTON
+		self.selenium.click(selector=selector)
+
+
+	def close(self):
+		if self.selenium:
+			self.selenium.quit()
