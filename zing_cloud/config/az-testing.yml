@@ -1,4 +1,0 @@
-#add production settings here
-mongo:
-  hosts: ['testing-mongo001.cloud.zingbox.com:27017','testing-mongo002.cloud.zingbox.com:27017']
-  rsName: 'zc-rs-testing'
