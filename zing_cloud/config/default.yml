@@ -1,0 +1,6 @@
+#default env for redis, mongo, kafka, zk, es should be here
+mongo:
+  hosts: ['testing-mongo002.cloud.zingbox.com:27017','testing-mongo001.cloud.zingbox.com:27017']
+  user: 'zingbox'
+  pass: 'abc123'
+  dbName: 'xiar'
