@@ -1,1 +1,0 @@
-java -jar C:\automation\agent.jar -jnlpUrl https://jenkins-master.cloud.zingbox.com/computer/win-rapid7/slave-agent.jnlp -secret a553f369bf011c4cebe892adc9faf1138639fb044114d74f7e28dea300d15a8a -workDir "C:\Jenkins" -noCertificateCheck
