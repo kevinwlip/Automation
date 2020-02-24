@@ -1,4 +1,4 @@
-# zbat
+# Automation
 
 0)  Checkout source
 git checkout https://github.com/kevinwlip/Automation.git
